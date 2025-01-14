@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.IO;
+using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
@@ -31,7 +32,7 @@ namespace NekoTracks
 		{
 			InitializeComponent();
 
-			player.Volume = 0.02;
+			player.Volume = ( App.LoadedData ? App.Volume : 0.02 );
 
 			var files = Directory.GetFiles( "." );
 			int nSongs = 0;
@@ -134,6 +135,7 @@ namespace NekoTracks
 			var slider = ( Slider )sender;
 			var percent = ( slider.Value - slider.Minimum ) / ( slider.Maximum - slider.Minimum );
 			player.Volume = percent;
+			App.Volume = percent;
 		}
 		private void SongEnd( object? sender,EventArgs e )
 		{
