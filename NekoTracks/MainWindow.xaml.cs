@@ -70,6 +70,8 @@ namespace NekoTracks
 
 		void ScrollSong( int dir )
 		{
+			if( trackList.Count == 0 ) return;
+
 			if( shuffling )
 			{
 				if( shuffleList.Count > 0 )
