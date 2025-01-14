@@ -1,0 +1,31 @@
+﻿<Window x:Class="NekoTracks.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NekoTracks"
+        mc:Ignorable="d"
+        Title="NekoTracks" Width="400" Height="300"
+		Background="LightGray">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"></RowDefinition>
+			<RowDefinition Height="Auto"></RowDefinition>
+			<RowDefinition Height="*"></RowDefinition>
+			<RowDefinition Height="Auto"></RowDefinition>
+			<RowDefinition Height="Auto"></RowDefinition>
+		</Grid.RowDefinitions>
+		
+		<TextBlock x:Name="SongName" TextWrapping="Wrap" Text="song name"/>
+		<ListBox x:Name="TrackList" Grid.Row="2" Width="Auto"></ListBox>
+		<StackPanel Orientation="Horizontal" Grid.Row="3">
+			<Button x:Name="PlayButton" Padding="3" Content="Play" Click="Play"></Button>
+			<Button x:Name="PauseButton" Padding="3" Content="Pause" Click="Pause"></Button>
+			<Button x:Name="LoopButton" Padding="3" Content="Loop" Click="Loop"></Button>
+			<Button x:Name="RestartButton" Padding="3" Content="Restart" Click="Restart"></Button>
+			<Button x:Name="NextButton" Padding="3" Content="Next" Click="Next"></Button>
+			<Button x:Name="PrevButton" Padding="3" Content="Prev" Click="Prev"></Button>
+		</StackPanel>
+		<Slider x:Name="VolumeSlider" ValueChanged="UpdateSliderVol" Grid.Row="4"></Slider>
+	</Grid>
+</Window>
