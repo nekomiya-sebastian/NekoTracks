@@ -25,6 +25,7 @@
 			<Button x:Name="RestartButton" Padding="3" Content="Restart" Click="Restart"></Button>
 			<Button x:Name="NextButton" Padding="3" Content="Next" Click="Next"></Button>
 			<Button x:Name="PrevButton" Padding="3" Content="Prev" Click="Prev"></Button>
+			<Button x:Name="ShuffleButton" Padding="3" Content="Shuffle" Click="Shuffle"></Button>
 		</StackPanel>
 		<Slider x:Name="VolumeSlider" ValueChanged="UpdateSliderVol" Grid.Row="4"></Slider>
 	</Grid>

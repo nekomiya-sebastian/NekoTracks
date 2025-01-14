@@ -87,10 +87,69 @@ namespace NekoTracks
 
 		void ScrollSong( int dir )
 		{
-			curTrack += dir;
-			if( curTrack >= trackList.Count ) curTrack = 0;
-			else if( curTrack < 0 ) curTrack = trackList.Count - 1;
-			( ( ListBoxItem )TrackList.Items[curTrack] ).IsSelected = true;
+			if( shuffling )
+			{
+				if( shuffleList.Count > 0 )
+				{
+					shuffleIndex += dir;
+
+					if( dir > 0 && shuffleIndex >= shuffleList.Count )
+					{
+						RegenShuffleList();
+						shuffleIndex = 0;
+					}
+					else if( shuffleIndex < 0 ) shuffleIndex = shuffleList.Count - 1;
+					
+					UpdatePrevButtonEnabled();
+					
+					curTrack = shuffleList[shuffleIndex];
+				}
+			}
+			else
+			{
+				curTrack += dir;
+
+				if( curTrack >= trackList.Count ) curTrack = 0;
+				else if( curTrack < 0 ) curTrack = trackList.Count - 1;
+			}
+
+			var targetTrack = ( ( ListBoxItem )TrackList.Items[curTrack] );
+			targetTrack.IsSelected = true;
+			TrackList.ScrollIntoView( targetTrack );
+		}
+
+		void RegenShuffleList()
+		{
+			shuffleList.Clear();
+			shuffleList.Capacity = trackList.Count;
+			for( int i = 0; i < trackList.Count; ++i ) shuffleList.Add( i );
+
+			// Fisher-Yates shuffle - https://bost.ocks.org/mike/shuffle/
+			{
+				var rng = new Random();
+				int ind = shuffleList.Count;
+				while( ind > 0 )
+				{
+					var curInd = ( int )Math.Floor( rng.NextDouble() * ind-- );
+
+					var temp = shuffleList[ind];
+					shuffleList[ind] = shuffleList[curInd];
+					shuffleList[curInd] = temp;
+				}
+			}
+
+			shuffleIndex = -1;
+			if( shuffleList.Count > 1 && shuffleList[0] == curTrack )
+			{
+				var temp = shuffleList[0];
+				shuffleList[0] = shuffleList[shuffleList.Count - 1];
+				shuffleList[shuffleList.Count - 1] = temp;
+			}
+		}
+
+		void UpdatePrevButtonEnabled()
+		{
+			PrevButton.IsEnabled = ( !shuffling || shuffleIndex > 0 );
 		}
 
 		private void LoadSong( object sender,RoutedEventArgs e )
@@ -98,6 +157,7 @@ namespace NekoTracks
 			curTrack = ( int )( ( ListBoxItem )sender ).Tag;
 			ReloadSong();
 		}
+
 		private void Play( object sender,RoutedEventArgs e )
 		{
 			playing = true;
@@ -130,6 +190,16 @@ namespace NekoTracks
 		{
 			ScrollSong( -1 );
 		}
+		private void Shuffle( object sender,RoutedEventArgs e )
+		{
+			shuffling = !shuffling;
+			ShuffleButton.Background = ( shuffling ? buttonCol2 : buttonCol1 );
+
+			if( shuffling ) RegenShuffleList();
+
+			UpdatePrevButtonEnabled();
+		}
+
 		private void UpdateSliderVol( object sender,RoutedPropertyChangedEventArgs<double> e )
 		{
 			var slider = ( Slider )sender;
@@ -149,11 +219,14 @@ namespace NekoTracks
 		MediaPlayer player = new MediaPlayer();
 		List<string> trackList = new List<string>();
 		List<string> trackPaths = new List<string>();
+		List<int> shuffleList = new List<int>();
 
 		int curTrack = -1;
+		int shuffleIndex = 0;
 
 		bool playing = false;
 		bool looping = false;
+		bool shuffling = false;
 
 		Brush buttonCol1;
 		Brush buttonCol2 = new SolidColorBrush( Colors.LightGreen );
