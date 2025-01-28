@@ -16,6 +16,15 @@ namespace NekoTracks
 			InitializeComponent();
 
 			player.Volume = ( App.LoadedData ? App.Volume : 0.02 );
+			
+			trackList.Clear();
+			trackPaths.Clear();
+			shuffleList.Clear();
+
+			TrackList.Items.Clear();
+
+			curTrack = -1;
+			shuffleIndex = 0;
 
 			var files = Directory.GetFiles( "." );
 			int nSongs = 0;
@@ -64,12 +73,47 @@ namespace NekoTracks
 		void ReloadSong()
 		{
 			player.Open( new Uri( trackPaths[curTrack] ) );
+			player.MediaOpened += OnSongLoadSuccess;
+			player.MediaFailed += OnSongLoadFail;
+		}
+
+		private void OnSongLoadSuccess( object? sender,EventArgs e )
+		{
+			SongLoadEnd();
+		}
+
+		private void OnSongLoadFail( object? sender,ExceptionEventArgs e )
+		{
+			var targetTrack = ( ( ListBoxItem )TrackList.Items[curTrack] );
+			targetTrack.IsEnabled = false;
+			targetTrack.Content = "(file not found)";
+			
+			bool hasValidTrack = false;
+			for( int i = 0; i < TrackList.Items.Count; ++i )
+			{
+				if( ( ( ListBoxItem )TrackList.Items[i] ).IsEnabled )
+				{
+					hasValidTrack = true;
+					break;
+				}
+			}
+
+			if( hasValidTrack ) ScrollSong( prevScrollDir );
+			else playing = false;
+
+			SongLoadEnd();
+		}
+
+		void SongLoadEnd()
+		{
 			UpdateSongText();
 			if( playing ) player.Play();
 		}
 
 		void ScrollSong( int dir )
 		{
+			prevScrollDir = dir;
+
 			if( trackList.Count == 0 ) return;
 
 			if( shuffling )
@@ -208,6 +252,7 @@ namespace NekoTracks
 
 		int curTrack = -1;
 		int shuffleIndex = 0;
+		int prevScrollDir = 1;
 
 		bool playing = false;
 		bool looping = false;
